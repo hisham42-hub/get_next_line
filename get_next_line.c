@@ -1,4 +1,4 @@
-#include "get_next_line"
+#include "get_next_line.h"
 
 char    *update_cache(char *cache, size_t n)
 {
@@ -7,6 +7,8 @@ char    *update_cache(char *cache, size_t n)
     size_t  j;
 
     if(!cache)
+        return (NULL);
+    if(!cache[n])
     {
         free(cache);
         return (NULL);
@@ -32,17 +34,20 @@ char    *extract_line(char *cache)
     char *line;
     size_t len;
 
-    if(!cache)
+    if(!cache || cache[0] == '\0')
         return (NULL);
     len = 0;
     l_ptr = ft_strchr(cache, '\n');
     if(l_ptr)
-        len = l_ptr - cache;
+        len = l_ptr - cache + 1;
     else
         len = ft_strlen(cache);
-    l_ptr = malloc((len + 1) * sizeof(char));
-    if(!line_l_ptr)
+    line = malloc((len + 1) * sizeof(char));
+    if(!line)
+    {
+        free(cache);
         return (NULL);
+    }
     line = ft_strncpy(line, cache, len);
     return (line);
 }
@@ -66,8 +71,8 @@ char    *read_to_cache(int fd, char *cache)
             return (NULL);
         }
         buffer[bytes_read] = '\0';
+        cache = ft_strjoin(cache, buffer);
     }
-    cache = ft_strjoin(cache, buffer);
     free(buffer);
     return (cache);
 }
@@ -79,9 +84,13 @@ char    *get_next_line(int fd)
 
     if(fd < 0 || BUFFER_SIZE <= 0)
         return NULL;
+    // if(!cache)
+    // {
+    //     cache = ft_intial_str("");
+    //     if(!cache)
+    //         return NULL;
+    // }
     cache = read_to_cache(fd, cache);
-    if(!cache)
-        return NULL;
     line = extract_line(cache);
     cache = update_cache(cache, ft_strlen(line));
     return (line);
