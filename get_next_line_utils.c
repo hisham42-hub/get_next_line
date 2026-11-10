@@ -1,66 +1,78 @@
 #include "get_next_line"
 
-char *ft_strchr(const char *str, char c)
+int ft_newline(t_list *chunks)
 {
-    if(!str)
-        return (NULL);
-    while (*str)
+    char *content;
+    t_list *temp_lst;
+
+    if(!chunk)
+        return (0);
+    temp_lst = chunk;
+    while (temp_lst)
     {
-        if(str == c)
-            return ((char *)str);
-        str++;
+        content = (char *)temp_lst->content;
+        while(*content)
+        {
+            if(*content == '\n')
+                return (1);
+            content++;
+        }
+        temp_lst = temp_lst->next;
     }
-    if(*str == c)
-        return ((char *)str);
-    return (NULL);
+    return (0);
 }
 
-size_t ft_strlen(const char *str)
+t_list  ft_lstnew(void *content)
 {
-    size_t i;
+    t_list *node;
 
-    i = 0;
-    while(*str)
-    {
-        i++;
-        str++;
-    }
-    return(i);
+    node = malloc(sizeof(t_list));
+    if(!node)
+        reurn (NULL);
+    node->content = content;
+    node->next = NULL;
+    return (node);
 }
 
-char *ft_strjoin(const char *s1, const char *s2)
+t_list  *ft_lstnew(char *content)
 {
-    size_t     i;
-    size_t     j;
-    char    *ptr;
+    t_list *node;
 
-    if(!s1 || !s2)
-        return NULL;
-    ptr = malloc((ft_strlen(s1) + ft_strlen(s2) + 1) * sizeof(char));
-    if(!ptr)
+    node = malloc(sizeof(t_list));
+    if(!node)
         return (NULL);
-    i = 0;
-    j = 0;
-    while (s1[j])
-        ptr[i++] = s1[j++];
-    j = 0;
-    while (s2[j])
-        ptr[i++] = s2[j++];
-    ptr[i] = '\0';
-    return(ptr);
+    node->content = content;
+    node->next = NULL;
+    return (node);
 }
 
-char *ft_strncpy(char *ptr, const char *src, size_t n)
+void    ft_lstaddback(t_list **lst, t_list *node)
 {
-    size_t i;
-    if(!ptr || !src)
+    if(!lst || !node)
         return (NULL);
-    i = 0;
-    while((i < n) && src[i])
+    if(!*lst)
     {
-        ptr[i] = src[i];
-        i++;
+        *lst = node;
+        return;
     }
-    ptr[i] = '\0';
-    return (ptr);
+    while(lst->next)
+        lst = lst->next;
+    lst->next = node;
+}
+
+char    *ft_readbuffer (int fd, size_t *bytes_read)
+{
+    char *buffer;
+
+    buffer = malloc((BUFFER_SIZE + 1) * sizeof(char));
+    if(!buffer)
+        return (NULL);
+    bytes_read = read(fd, buffer, BUFFER_SIZE);
+    if(bytes_read == -1)
+    {
+        free(buffer)
+        return (NULL);
+    }
+    buffer[bytes_read] = '\0';
+    return (buffer);
 }

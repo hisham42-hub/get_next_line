@@ -7,14 +7,19 @@
 # ifndef BUFFER_SIZE
 # define BUFFER_SIZE 42
 
-char    *update_cache(char *cache, size_t n);
-char    *extract_line(char *cache);
-char    *read_to_cache(int fd, char *cache);
+typedef struct s_list
+{
+    void          *content;
+    struct s_list   *next;
+}   t_list;
+
+char    *ft_readbuffer (int fd, size_t *bytes_read);
+int     ft_newline(t_list *chunks);
+t_list  *ft_lstnew(char *content);
+void    ft_lstaddback(t_list **lst, t_list *node);
+char    *update_chunks(t_list *chunks);
+char    *extract_line(t_list *chunks);
+t_list  *read_to_chunks(int fd, t_list *chunks);
 char    *get_next_line(int fd);
-char    *ft_strchr(const char *str, char c);
-size_t  ft_strlen(const char *str);
-char    *ft_strncpy(char *ptr, const char *src, size_t n);
-char    *ft_strjoin(const char *s1, const char *s2);
-int     ft_count_newline(char *str);
 
 #endif
