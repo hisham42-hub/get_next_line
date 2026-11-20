@@ -13,7 +13,7 @@
 #include "get_next_line.h"
 #include "get_next_line.h"
 
-char	*read_to_buffer(int fd, ssize_t *bytes_read)
+static char	*read_to_buffer(int fd, ssize_t *bytes_read)
 {
 	char	*b;
 	int		i;
@@ -40,7 +40,7 @@ char	*read_to_buffer(int fd, ssize_t *bytes_read)
 	return (b[i] = '\0', b);
 }
 
-t_list	*update_chunks(t_list *chunks)
+static t_list	*update_chunks(t_list *chunks)
 {
 	char	*content;
 	size_t	i;
@@ -69,7 +69,7 @@ t_list	*update_chunks(t_list *chunks)
 	return (chunks);
 }
 
-char	*extract_line(t_list *chunks)
+static char	*extract_line(t_list *chunks)
 {
 	char	*line;
 	char	*content;
@@ -95,7 +95,7 @@ char	*extract_line(t_list *chunks)
 	return (line);
 }
 
-t_list	*read_to_chunks(int fd, t_list *chunks)
+static t_list	*read_to_chunks(int fd, t_list *chunks)
 {
 	char	*buffer;
 	ssize_t	bytes_read;
@@ -149,34 +149,3 @@ char	*get_next_line(int fd)
 	}
 	return (line);
 }
-
-// t_list	*read_to_chunks(int fd, t_list *chunks)
-// {
-// 	char	*buffer;
-// 	ssize_t	bytes_read;
-// 	t_list	*node;
-// 	t_list	*last;
-
-// 	last = ft_lstlast(chunks);
-// 	if (last && ft_strchr(last->content, '\n'))
-// 		return (chunks);
-// 	while (1)
-// 	{
-// 		buffer = read_to_buffer(fd, &bytes_read);
-// 		if (!buffer && bytes_read == -1)
-// 			return (del(chunks));
-// 		if (!buffer && bytes_read == 0)
-// 			break ;
-// 		node = ft_lstnew(buffer);
-// 		if (!node)
-// 			return (del(chunks));
-// 		if (!chunks)
-// 			chunks = node;
-// 		else
-// 			last->next = node;
-// 		last = node;
-// 		if (ft_strchr(buffer, '\n'))
-// 			break ;
-// 	}
-// 	return (chunks);
-// }

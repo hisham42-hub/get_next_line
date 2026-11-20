@@ -67,7 +67,7 @@ t_list	*ft_lstlast(t_list *lst)
 {
 	t_list	*last;
 
-	if (!lst || !lst->content)
+	if (!lst)
 		return (NULL);
 	while (lst)
 	{
@@ -92,75 +92,3 @@ void	*del(t_list *lst)
 	}
 	return (NULL);
 }
-
-// int	has_nl_from(char *s, size_t start)
-// {
-// 	if (!s)
-// 		return (0);
-// 	while (s[start])
-// 	{
-// 		if (s[start] == '\n')
-// 			return (1);
-// 		start++;
-// 	}
-// 	return (0);
-// }
-
-// size_t	gnl_linelen(t_gnl *gnl)
-// {
-// 	t_list	*cur;
-// 	size_t	len;
-// 	size_t	i;
-
-// 	len = 0;
-// 	cur = gnl->head;
-// 	while (cur)
-// 	{
-// 		i = 0;
-// 		if (cur == gnl->head)
-// 			i = gnl->start;
-// 		while (cur->content[i])
-// 		{
-// 			len++;
-// 			if (cur->content[i] == '\n')
-// 				return (len);
-// 			i++;
-// 		}
-// 		cur = cur->next;
-// 	}
-// 	return (len);
-// }
-
-// t_list	*gnl_new_node(char *content)
-// {
-// 	t_list	*node;
-
-// 	node = malloc(sizeof(t_list));
-// 	if (!node)
-// 	{
-// 		free(content);
-// 		return (NULL);
-// 	}
-// 	node->content = content;
-// 	node->next = NULL;
-// 	return (node);
-// }
-
-// void	*gnl_clear(t_gnl *gnl)
-// {
-// 	t_list	*cur;
-// 	t_list	*next;
-
-// 	cur = gnl->head;
-// 	while (cur)
-// 	{
-// 		next = cur->next;
-// 		free(cur->content);
-// 		free(cur);
-// 		cur = next;
-// 	}
-// 	gnl->head = NULL;
-// 	gnl->tail = NULL;
-// 	gnl->start = 0;
-// 	return (NULL);
-// }
