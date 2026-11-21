@@ -1,79 +1,150 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                       :::      ::::::::    */
+/*   get_next_line_bonus.c                             :+:      :+:    :+:    */
+/*                                                   +:+ +:+         +:+      */
+/*   By: hsalahal <hsalahal@student.42abudhabi.ae> #+#  +:+       +#+         */
+/*                                               +#+#+#+#+#+   +#+            */
+/*   Created: 2026/11/21 03:22:37 by hsalahal         #+#    #+#              */
+/*   Updated: 2026/11/21 03:58:51 by hsalahal        ###   ########.fr        */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "get_next_line_bonus.h"
 
-static *char extract_line
+static char	*read_to_buffer(int fd, ssize_t *bytes_read)
 {
-    char *line;
+	char	*b;
+	int		i;
 
-    return(line);
+	i = BUFFER_SIZE;
+	b = malloc((i == 1) * 1025 + (i != 1) * (i + 1));
+	if (!b)
+		return (NULL);
+	if (i != 1)
+	{
+		*bytes_read = read(fd, b, i);
+		if (*bytes_read <= 0)
+			return (free(b), NULL);
+		return (b[*bytes_read] = '\0', b);
+	}
+	i = 0;
+	*bytes_read = read(fd, &b[i], BUFFER_SIZE);
+	while (i < 1023 && *bytes_read > 0 && b[i] != '\n')
+		*bytes_read = read(fd, &b[++i], BUFFER_SIZE);
+	if (i == 0 && *bytes_read <= 0)
+		return (free(b), NULL);
+	if (*bytes_read > 0 && (b[i] == '\n' || i == 1023))
+		i++;
+	return (b[i] = '\0', b);
 }
 
-static char *read_to_buffer(int fd, ssize_t *bytes_read)
+static t_list	*update_chunks(t_list *chunks)
 {
-    char *b;
-    int  i;
+	char	*content;
+	size_t	i;
+	size_t	j;
+	t_list	*temp;
 
-    b = malloc((BUFFER_SIZE == 1) * 1025 + (BUFFER_SIZE != 1) * (BUFFER_SIZE + 1));
-    if(!b)
-        return (NULL);
-    if(BUFFER_SIZE != 1)
-    {
-        *bytes_read = read(fd, b, BUFFER_SIZE);
-        if(*bytes_read <= 0)
-            return(free(b), NULL);
-        return(b[*bytes_read] = '\0', b);
-    }
+	while (chunks && !ft_strchr((chunks->content), '\n'))
+	{
+		temp = chunks->next;
+		free(chunks->content);
+		free(chunks);
+		chunks = temp;
+	}
+	if (!chunks)
+		return (NULL);
+	content = chunks->content;
+	i = 0;
+	while (content[i] && content[i] != '\n')
+		i++;
+	j = 0;
+	if (content[i] == '\n')
+		i++;
+	while (content[i])
+		content[j++] = content[i++];
+	content[j] = '\0';
+	return (chunks);
 }
 
-static t_list *read_to_chunks(int fd, t_list *chunks)
+static char	*extract_line(t_list *chunks)
 {
-    char *buffer;
-    ssize_t bytes_read;
-    t_list *last;
-    t_list *node;
+	char	*line;
+	char	*content;
+	size_t	len;
+	size_t	i;
 
-    last = ft_lstlast(chunks);
-    while(!last || !ft_strchr(last->content, '\n'))
-    {
-        buffer = read_to_buffer(fd, &bytes_read);
-        if(!buffer && bytes_read == -1)
-            return(del(chunks));
-        if(!buffer && bytes_read == 0)
-            break;
-        node = ft_lstnew(buffer);
-        if(!node)
-            return(del(chunks));
-        if(!chunks)
-            chunks = node;
-        else
-            last->next = node;
-        last = node;
-    }
-    return (chunks);
+	len = ft_linelen(chunks);
+	if (len == 0)
+		return (NULL);
+	line = malloc((len + 1) * sizeof(char));
+	if (!line)
+		return (NULL);
+	len = 0;
+	while (chunks && (len == 0 || line[len - 1] != '\n'))
+	{
+		i = 0;
+		content = (char *)(chunks->content);
+		while (content[i] && (len == 0 || line[len - 1] != '\n'))
+			line[len++] = content[i++];
+		chunks = chunks->next;
+	}
+	line[len] = '\0';
+	return (line);
 }
 
-char *get_next_line_bonus(fd)
+static t_list	*read_to_chunks(int fd, t_list *chunks)
 {
-    static t_list   *chunks[1024];
-    char *line;
+	char	*buffer;
+	ssize_t	bytes_read;
+	t_list	*node;
+	t_list	*last;
 
-    if(fd < 0 || BUFFER_SIZE <= 0 || fd >= 1024)
-        return NULL;
-    chunks[fd] = read_to_chunks(fd, chunks[fd]);
-    if(!chunks[fd])
-        return (NULL);
-    line = extract_line(chunks[fd]);
-    if(!line)
-    {
-        free(line);
-        return(del(chunks[fd]));
-    }
-    chunks[fd] = update_chunks(chunks[fd]);
-    if(chunks[fd] || !((char *)chunks[fd]->content)[0])
-    {
-        temp = chunks[fd]->next;
-        free(chunks[fd]->content);
-        free(chunks[fd]);
-        chunks[fd] = temp;
-    }
-    return(line);
+	last = ft_lstlast(chunks);
+	while (!last || !ft_strchr(last->content, '\n'))
+	{
+		buffer = read_to_buffer(fd, &bytes_read);
+		if (!buffer && bytes_read == -1)
+			return (del(chunks));
+		else if (!buffer && bytes_read == 0)
+			break ;
+		node = ft_lstnew(buffer);
+		if (!node)
+			return (del(chunks));
+		if (!chunks)
+			chunks = node;
+		else
+			last->next = node;
+		last = node;
+	}
+	return (chunks);
+}
+
+char	*get_next_line(int fd)
+{
+	static t_list	*chunks[1024];
+	char			*line;
+	t_list			*temp;
+
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd >= 1024)
+		return (NULL);
+	chunks[fd] = read_to_chunks(fd, chunks[fd]);
+	if (!chunks[fd])
+		return (NULL);
+	line = extract_line(chunks[fd]);
+	if (!line)
+	{
+		free(line);
+		return (del(chunks[fd]));
+	}
+	chunks[fd] = update_chunks(chunks[fd]);
+	if (chunks[fd] && !((char *)(chunks[fd]->content))[0])
+	{
+		temp = chunks[fd]->next;
+		free(chunks[fd]->content);
+		free(chunks[fd]);
+		chunks[fd] = temp;
+	}
+	return (line);
 }

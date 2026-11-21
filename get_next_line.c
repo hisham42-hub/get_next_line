@@ -6,11 +6,10 @@
 /*   By: hsalahal <hsalahal@student.42abudhabi.ae> #+#  +:+       +#+         */
 /*                                               +#+#+#+#+#+   +#+            */
 /*   Created: 2026/11/18 18:23:52 by hsalahal         #+#    #+#              */
-/*   Updated: 2026/11/19 10:55:49 by hsalahal        ###   ########.fr        */
+/*   Updated: 2026/11/21 03:59:01 by hsalahal        ###   ########.fr        */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
 #include "get_next_line.h"
 
 static char	*read_to_buffer(int fd, ssize_t *bytes_read)
@@ -30,9 +29,9 @@ static char	*read_to_buffer(int fd, ssize_t *bytes_read)
 		return (b[*bytes_read] = '\0', b);
 	}
 	i = 0;
-	*bytes_read = read(fd, &b[i], 1);
+	*bytes_read = read(fd, &b[i], BUFFER_SIZE);
 	while (i < 1023 && *bytes_read > 0 && b[i] != '\n')
-		*bytes_read = read(fd, &b[++i], 1);
+		*bytes_read = read(fd, &b[++i], BUFFER_SIZE);
 	if (i == 0 && *bytes_read <= 0)
 		return (free(b), NULL);
 	if (*bytes_read > 0 && (b[i] == '\n' || i == 1023))
